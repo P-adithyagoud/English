@@ -90,8 +90,11 @@ def create_app(test_config=None):
             "timestamp": "2026-05-21T13:42:00"
         }), 200
 
-    # Auto-initialize and seed tables
-    init_db(app)
+    # Auto-initialize and seed tables with robust error handling
+    try:
+        init_db(app)
+    except Exception as e:
+        print(f"\n[DATABASE ERROR] Failed to initialize/seed database: {e}\n")
     
     return app
 
