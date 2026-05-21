@@ -19,7 +19,7 @@ def save_onboarding(current_user):
     current_user.name = data.get('name', current_user.name)
     current_user.english_level = data.get('english_level')
     current_user.confidence_level = int(data.get('confidence_level', 1))
-    current_user.weak_areas = json.dumps(data.get('weak_areas', []))
+    current_user.weak_areas = data.get('weak_areas', [])
     current_user.learning_style = data.get('learning_style')
     current_user.daily_goal = data.get('daily_goal')
     
@@ -151,7 +151,7 @@ def get_dashboard(current_user):
     target_track = Track.query.filter_by(title=target_track_title).first()
     
     recommended_lesson = None
-    completed_ids = json.loads(progress.completed_lessons) if progress.completed_lessons else []
+    completed_ids = progress.completed_lessons if progress.completed_lessons else []
     
     if target_track:
         # Get lessons in this track

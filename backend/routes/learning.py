@@ -16,7 +16,7 @@ def get_tracks(current_user):
     if current_user.role == 'student':
         progress = StudentProgress.query.filter_by(user_id=current_user.id).first()
         if progress and progress.completed_lessons:
-            completed_lessons = json.loads(progress.completed_lessons)
+            completed_lessons = progress.completed_lessons
             
     track_list = []
     for t in tracks:
@@ -47,7 +47,7 @@ def get_tracks(current_user):
         
     return jsonify({"tracks": track_list}), 200
 
-@learning_bp.route('/lessons/<int:lesson_id>', methods=['GET'])
+@learning_bp.route('/lessons/<string:lesson_id>', methods=['GET'])
 @token_required
 def get_lesson(current_user, lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
@@ -59,7 +59,7 @@ def get_lesson(current_user, lesson_id):
     if current_user.role == 'student':
         progress = StudentProgress.query.filter_by(user_id=current_user.id).first()
         if progress and progress.completed_lessons:
-            completed = lesson.id in json.loads(progress.completed_lessons)
+            completed = lesson.id in progress.completed_lessons
             
     return jsonify({
         "lesson": {
@@ -84,7 +84,7 @@ def submit_quiz(current_user):
     if not data or not data.get('lesson_id'):
         return jsonify({"message": "Missing lesson ID or responses"}), 400
         
-    lesson_id = int(data.get('lesson_id'))
+    lesson_id = data.get('lesson_id')
     score = int(data.get('score', 0))
     total_questions = int(data.get('total_questions', 1))
     time_taken = int(data.get('time_taken', 60)) # seconds
@@ -142,17 +142,17 @@ def submit_quiz(current_user):
     progress.last_activity_date = today_str
     
     # 3. Update Completed Lessons list
-    completed = json.loads(progress.completed_lessons) if progress.completed_lessons else []
+    completed = list(progress.completed_lessons) if progress.completed_lessons else []
     if lesson_id not in completed:
         completed.append(lesson_id)
-        progress.completed_lessons = json.dumps(completed)
+        progress.completed_lessons = completed
         
     # 4. Update total progress XP
     progress.total_xp = current_user.xp
     
     # 5. Update Weak Topics frequency
     # We analyze which questions were missed. Let's record in progress.
-    weak_topics_dict = json.loads(progress.weak_topics) if progress.weak_topics else {}
+    weak_topics_dict = dict(progress.weak_topics) if progress.weak_topics else {}
     for wrong in wrong_answers:
         # 'wrong' is the topic title or question type, e.g. "Simple Present"
         weak_topics_dict[wrong] = weak_topics_dict.get(wrong, 0) + 1
@@ -162,7 +162,7 @@ def submit_quiz(current_user):
         category = lesson.module.track.category if (lesson.module and lesson.module.track) else "General English"
         weak_topics_dict[category] = weak_topics_dict.get(category, 0) + 1
         
-    progress.weak_topics = json.dumps(weak_topics_dict)
+    progress.weak_topics = weak_topics_dict
     
     # Save the quiz attempt
     attempt = QuizAttempt(

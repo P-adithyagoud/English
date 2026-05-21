@@ -1,4 +1,5 @@
 import json
+import uuid
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +9,7 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'users'
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     role = db.Column(db.String(50), nullable=False) # 'student' or 'faculty'
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -16,7 +17,7 @@ class User(db.Model):
     learning_goal = db.Column(db.String(100), nullable=True)
     english_level = db.Column(db.String(100), nullable=True)
     confidence_level = db.Column(db.Integer, default=1)
-    weak_areas = db.Column(db.Text, nullable=True) # JSON array or comma list
+    weak_areas = db.Column(db.JSON, nullable=True) # JSON array in PostgreSQL (JSONB), fallback in SQLite
     learning_style = db.Column(db.String(100), nullable=True)
     daily_goal = db.Column(db.String(100), nullable=True)
     streak = db.Column(db.Integer, default=0)
@@ -42,7 +43,7 @@ class User(db.Model):
             "learning_goal": self.learning_goal,
             "english_level": self.english_level,
             "confidence_level": self.confidence_level,
-            "weak_areas": json.loads(self.weak_areas) if self.weak_areas else [],
+            "weak_areas": self.weak_areas if self.weak_areas is not None else [],
             "learning_style": self.learning_style,
             "daily_goal": self.daily_goal,
             "streak": self.streak,
@@ -53,8 +54,7 @@ class User(db.Model):
 class Track(db.Model):
     __tablename__ = 'tracks'
     
-    id = db.Model.metadata.tables.get('tracks') # Avoid collision
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(100), nullable=True)
@@ -73,8 +73,8 @@ class Track(db.Model):
 class Module(db.Model):
     __tablename__ = 'modules'
     
-    id = db.Column(db.Integer, primary_key=True)
-    track_id = db.Column(db.Integer, db.ForeignKey('tracks.id', ondelete='CASCADE'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    track_id = db.Column(db.String(36), db.ForeignKey('tracks.id', ondelete='CASCADE'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     order_index = db.Column(db.Integer, default=0)
     
@@ -94,8 +94,8 @@ class Module(db.Model):
 class Lesson(db.Model):
     __tablename__ = 'lessons'
     
-    id = db.Column(db.Integer, primary_key=True)
-    module_id = db.Column(db.Integer, db.ForeignKey('modules.id', ondelete='CASCADE'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    module_id = db.Column(db.String(36), db.ForeignKey('modules.id', ondelete='CASCADE'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False) # Markdown curriculum
     order_index = db.Column(db.Integer, default=0)
@@ -119,11 +119,11 @@ class Lesson(db.Model):
 class Question(db.Model):
     __tablename__ = 'questions'
     
-    id = db.Column(db.Integer, primary_key=True)
-    lesson_id = db.Column(db.Integer, db.ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    lesson_id = db.Column(db.String(36), db.ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False)
     question = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(50), nullable=False) # 'mcq', 'fill_in_the_blank', 'sentence_correction', 'vocabulary', 'scenario'
-    options = db.Column(db.Text, nullable=True) # JSON-encoded list of strings (MCQ options)
+    options = db.Column(db.JSON, nullable=True) # JSON list of options for MCQ
     correct_answer = db.Column(db.Text, nullable=False)
     explanation = db.Column(db.Text, nullable=True)
 
@@ -133,7 +133,7 @@ class Question(db.Model):
             "lesson_id": self.lesson_id,
             "question": self.question,
             "type": self.type,
-            "options": json.loads(self.options) if self.options else [],
+            "options": self.options if self.options is not None else [],
             "correct_answer": self.correct_answer,
             "explanation": self.explanation
         }
@@ -141,9 +141,9 @@ class Question(db.Model):
 class QuizAttempt(db.Model):
     __tablename__ = 'quiz_attempts'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    lesson_id = db.Column(db.Integer, db.ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    lesson_id = db.Column(db.String(36), db.ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     accuracy = db.Column(db.Float, nullable=False)
     xp_earned = db.Column(db.Integer, default=0)
@@ -167,21 +167,21 @@ class QuizAttempt(db.Model):
 class StudentProgress(db.Model):
     __tablename__ = 'student_progress'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), unique=True, nullable=False)
-    completed_lessons = db.Column(db.Text, default='[]') # JSON list of integer IDs
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id', ondelete='CASCADE'), unique=True, nullable=False)
+    completed_lessons = db.Column(db.JSON, default=list) # JSON array of lesson UUIDs
     total_xp = db.Column(db.Integer, default=0)
     current_streak = db.Column(db.Integer, default=0)
-    weak_topics = db.Column(db.Text, default='{}') # JSON frequency dictionary (e.g. {"Present Perfect": 3})
+    weak_topics = db.Column(db.JSON, default=dict) # JSON mapping topic frequency
     last_activity_date = db.Column(db.String(50), default=lambda: datetime.utcnow().strftime('%Y-%m-%d'))
 
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "completed_lessons": json.loads(self.completed_lessons) if self.completed_lessons else [],
+            "completed_lessons": self.completed_lessons if self.completed_lessons is not None else [],
             "total_xp": self.total_xp,
             "current_streak": self.current_streak,
-            "weak_topics": json.loads(self.weak_topics) if self.weak_topics else {},
+            "weak_topics": self.weak_topics if self.weak_topics is not None else {},
             "last_activity_date": self.last_activity_date
         }

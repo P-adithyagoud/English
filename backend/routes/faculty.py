@@ -41,7 +41,7 @@ def get_analytics(current_user):
     
     completion_rates = []
     for prog in progress_rows:
-        completed = json.loads(prog.completed_lessons) if prog.completed_lessons else []
+        completed = prog.completed_lessons if prog.completed_lessons else []
         if total_lessons > 0:
             rate = len(completed) / total_lessons
         else:
@@ -133,9 +133,9 @@ def get_students(current_user):
         completed_count = 0
         weak_topics = {}
         if progress:
-            completed = json.loads(progress.completed_lessons) if progress.completed_lessons else []
+            completed = progress.completed_lessons if progress.completed_lessons else []
             completed_count = len(completed)
-            weak_topics = json.loads(progress.weak_topics) if progress.weak_topics else {}
+            weak_topics = progress.weak_topics if progress.weak_topics else {}
             
         student_list.append({
             "id": s.id,
@@ -162,7 +162,7 @@ def add_lesson(current_user):
     if not data or not data.get('module_id') or not data.get('title') or not data.get('content'):
         return jsonify({"message": "Missing required content fields"}), 400
         
-    module_id = int(data.get('module_id'))
+    module_id = data.get('module_id')
     module = Module.query.get_or_404(module_id)
     
     # Calculate index
@@ -185,7 +185,7 @@ def add_lesson(current_user):
             lesson_id=lesson.id,
             question=q.get('question'),
             type=q.get('type'),
-            options=json.dumps(q.get('options', [])),
+            options=q.get('options', []),
             correct_answer=q.get('correct_answer'),
             explanation=q.get('explanation', '')
         )
@@ -198,7 +198,7 @@ def add_lesson(current_user):
         "lesson": lesson.to_dict()
     }), 201
 
-@faculty_bp.route('/lessons/<int:lesson_id>', methods=['DELETE'])
+@faculty_bp.route('/lessons/<string:lesson_id>', methods=['DELETE'])
 @token_required
 def delete_lesson(current_user, lesson_id):
     if current_user.role != 'faculty':
