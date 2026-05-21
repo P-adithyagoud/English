@@ -110,7 +110,7 @@ INSERT INTO users (id, name, email, role, password_hash, learning_goal, english_
 (3, 'John Doe', 'john@example.com', 'student', 'scrypt:32768:8:1$gUSBr7vlSBhvKaCX$ced3d86047e8ecf32ba5aa7d381743046688f54b78dc446b946378de68e13e4bc63cd293d2626cebce4ce95d32cdcc7111efc8cb3fe71525fab9dd9a0b40883b', 'Communication Improvement', 'Beginner (A2)', 1, '["Grammar Foundations", "Sentence Structure"]', 'Visual Lessons', 'Regular (20 XP/day)', 3, 110, CURRENT_TIMESTAMP - INTERVAL '4 days'),
 (4, 'Emma Watson', 'emma@example.com', 'student', 'scrypt:32768:8:1$su8gGYb3Y689EqPt$012223bb3c70e9841f39a70b414c5d6f5acce0f2ec026b98de12f88ff9502554a5de734645dd6481706f488cea2d9fb1f76dd1fb7db21ebf68ae5566e21d640d', 'IELTS Preparation', 'Advanced (C1)', 5, '["Cue Card Length", "Complex Prepositions"]', 'Fast Pace', 'Insane (50 XP/day)', 28, 750, CURRENT_TIMESTAMP - INTERVAL '30 days');
 
-SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE(max(id), 1)) FROM users;
+SELECT setval('users_id_seq', COALESCE(max(id), 1)) FROM users;
 
 -- 5. SEED COURSE TRACKS
 INSERT INTO tracks (id, title, description, category) VALUES
@@ -120,7 +120,7 @@ INSERT INTO tracks (id, title, description, category) VALUES
 (4, 'Interview Communication', 'Crack technical and HR interviews with structural confidence, structured pitch formulas, and stellar body language.', 'Interviews'),
 (5, 'IELTS Preparation', 'Boost your speaking band scores and perfect cue card descriptions with strategic templates.', 'IELTS');
 
-SELECT setval(pg_get_serial_sequence('tracks', 'id'), COALESCE(max(id), 1)) FROM tracks;
+SELECT setval('tracks_id_seq', COALESCE(max(id), 1)) FROM tracks;
 
 -- 6. SEED MODULE CATEGORIES
 INSERT INTO modules (id, track_id, title, order_index) VALUES
@@ -140,7 +140,7 @@ INSERT INTO modules (id, track_id, title, order_index) VALUES
 (14, 5, 'Listening & Reading Basics', 2),
 (15, 5, 'Speaking & Writing Basics', 3);
 
-SELECT setval(pg_get_serial_sequence('modules', 'id'), COALESCE(max(id), 1)) FROM modules;
+SELECT setval('modules_id_seq', COALESCE(max(id), 1)) FROM modules;
 
 -- 7. SEED CURRICULUM LESSONS (With clean escaped single quotes)
 INSERT INTO lessons (id, module_id, title, content, order_index, xp_reward) VALUES
@@ -287,7 +287,7 @@ To get a high band score in IELTS Writing and Speaking, you must connect sentenc
 *   **Addition (extra details)**: Use "and", "furthermore", or "in addition".
 *   **Cause & Effect**: Use "because", "so", or "therefore".', 1, 25);
 
-SELECT setval(pg_get_serial_sequence('lessons', 'id'), COALESCE(max(id), 1)) FROM lessons;
+SELECT setval('lessons_id_seq', COALESCE(max(id), 1)) FROM lessons;
 
 -- 8. SEED DIVERSE GRADED QUESTIONS
 INSERT INTO questions (id, lesson_id, question, type, options, correct_answer, explanation) VALUES
@@ -357,7 +357,7 @@ INSERT INTO questions (id, lesson_id, question, type, options, correct_answer, e
 -- Lesson 15 Question
 (35, 15, 'Join these two simple sentences: ''I like apples. I do not like oranges.''', 'sentence_correction', NULL, 'I like apples but I do not like oranges.', 'Brilliant! We use ''but'' to connect two opposite ideas. This makes your English sound much more natural!');
 
-SELECT setval(pg_get_serial_sequence('questions', 'id'), COALESCE(max(id), 1)) FROM questions;
+SELECT setval('questions_id_seq', COALESCE(max(id), 1)) FROM questions;
 
 -- 9. SEED DUMMY PERFORMANCE ATTEMPTS
 INSERT INTO quiz_attempts (id, user_id, lesson_id, score, accuracy, xp_earned, time_taken, created_at) VALUES
@@ -365,7 +365,7 @@ INSERT INTO quiz_attempts (id, user_id, lesson_id, score, accuracy, xp_earned, t
 (2, 4, 1, 5, 1.0, 25, 95,  CURRENT_TIMESTAMP - INTERVAL '4 days'),
 (3, 4, 3, 5, 1.0, 30, 105, CURRENT_TIMESTAMP - INTERVAL '1 day');
 
-SELECT setval(pg_get_serial_sequence('quiz_attempts', 'id'), COALESCE(max(id), 1)) FROM quiz_attempts;
+SELECT setval('quiz_attempts_id_seq', COALESCE(max(id), 1)) FROM quiz_attempts;
 
 -- 10. SEED INITIAL STUDENT PROGRESS
 INSERT INTO student_progress (id, user_id, completed_lessons, total_xp, current_streak, weak_topics, last_activity_date) VALUES
@@ -373,4 +373,4 @@ INSERT INTO student_progress (id, user_id, completed_lessons, total_xp, current_
 (2, 3, '[]',  110, 3,  '{"Simple Present": 4, "Tenses": 3}',             CURRENT_DATE),
 (3, 4, '[1, 3]', 750, 28, '{"Prepositions": 1}',                            CURRENT_DATE);
 
-SELECT setval(pg_get_serial_sequence('student_progress', 'id'), COALESCE(max(id), 1)) FROM student_progress;
+SELECT setval('student_progress_id_seq', COALESCE(max(id), 1)) FROM student_progress;
