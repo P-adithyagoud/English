@@ -1,8 +1,15 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 # Explicitly load .env from the backend folder to avoid CWD mismatch on launch
 backend_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Ensure parent directory is in sys.path so 'backend.xxx' imports work everywhere
+parent_dir = os.path.dirname(backend_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
 env_path = os.path.join(backend_dir, '.env')
 load_dotenv(dotenv_path=env_path)
 
@@ -23,7 +30,11 @@ def create_app(test_config=None):
     
     # Database Configuration
     # Fallback to local SQLite file for effortless zero-config execution
-    sqlite_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fluentflow.db')
+    if os.environ.get('VERCEL') == '1':
+        sqlite_path = '/tmp/fluentflow.db'
+    else:
+        sqlite_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fluentflow.db')
+        
     database_url = os.environ.get('DATABASE_URL')
     
     if database_url:
@@ -42,7 +53,7 @@ def create_app(test_config=None):
             app.config['SQLALCHEMY_DATABASE_URI'] = database_url
         except Exception as e:
             print(f"\n[DATABASE WARNING] PostgreSQL connection check failed: {e}")
-            print(">>> Falling back to local SQLite database (fluentflow.db) for offline mode...\n")
+            print(f">>> Falling back to SQLite database ({sqlite_path}) for offline mode...\n")
             app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{sqlite_path}'
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{sqlite_path}'
