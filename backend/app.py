@@ -5,7 +5,19 @@ from dotenv import load_dotenv
 # Explicitly load .env from the backend folder to avoid CWD mismatch on launch
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Ensure parent directory is in sys.path so 'backend.xxx' imports work everywhere
+# Ensure 'backend' can be imported. 
+# On platforms like Vercel, the contents of the 'backend' folder are deployed directly 
+# at the serverless root '/var/task', meaning the physical 'backend' folder does not exist.
+# We dynamically create a virtual 'backend' package in sys.modules to route absolute imports.
+try:
+    import backend
+except ModuleNotFoundError:
+    import types
+    backend_module = types.ModuleType('backend')
+    backend_module.__path__ = [backend_dir]
+    sys.modules['backend'] = backend_module
+
+# Also keep the parent directory in path as fallback
 parent_dir = os.path.dirname(backend_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
