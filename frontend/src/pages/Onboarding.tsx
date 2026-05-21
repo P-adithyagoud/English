@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { API_BASE_URL } from '../config';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -55,7 +56,7 @@ export default function Onboarding() {
   const handleSubmitOnboarding = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:5000/api/student/onboarding', {
+      const response = await fetch(`${API_BASE_URL}/api/student/onboarding`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

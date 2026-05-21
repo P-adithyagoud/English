@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { API_BASE_URL } from '../config';
 import QuizEngine from '../components/QuizEngine';
 import type { QuestionData } from '../components/QuizEngine';
 import { 
@@ -44,7 +45,7 @@ export default function LearningTracks() {
   const fetchTracks = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/learning/tracks', {
+      const response = await fetch(`${API_BASE_URL}/api/learning/tracks`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -69,7 +70,7 @@ export default function LearningTracks() {
   const handleLaunchLesson = async (lessonId: number) => {
     setIsQuestionsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/learning/lessons/${lessonId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/learning/lessons/${lessonId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

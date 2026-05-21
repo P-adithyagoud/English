@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { API_BASE_URL } from '../config';
 import { 
   Users, 
   Award, 
@@ -87,8 +88,8 @@ export default function FacultyDashboard() {
       const authHeader = { 'Authorization': `Bearer ${token}` };
       
       const [analyticsRes, studentsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/faculty/analytics', { headers: authHeader }),
-        fetch('http://localhost:5000/api/faculty/students', { headers: authHeader })
+        fetch(`${API_BASE_URL}/api/faculty/analytics`, { headers: authHeader }),
+        fetch(`${API_BASE_URL}/api/faculty/students`, { headers: authHeader })
       ]);
 
       if (analyticsRes.ok && studentsRes.ok) {
@@ -154,7 +155,7 @@ export default function FacultyDashboard() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/faculty/lessons', {
+      const response = await fetch(`${API_BASE_URL}/api/faculty/lessons`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

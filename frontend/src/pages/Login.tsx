@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { API_BASE_URL } from '../config';
 import { 
   Sparkles, 
   Mail, 
@@ -27,7 +28,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -53,7 +54,7 @@ export default function Login() {
         setError(data.message || 'Invalid credentials');
       }
     } catch (err) {
-      setError('Connection failed. Is the Flask backend running on port 5000?');
+      setError('Connection failed. Cannot connect to backend server.');
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +65,7 @@ export default function Login() {
     setError('');
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: demoEmail, password: 'password123' })

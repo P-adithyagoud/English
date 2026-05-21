@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { API_BASE_URL } from '../config';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -128,7 +129,7 @@ export default function QuizEngine({ lessonId, questions, onComplete, onClose }:
       const finalScore = score + (isCorrect ? 1 : 0); // Include final answer if correct
       const actualScore = isChecked ? finalScore : score;
       
-      const response = await fetch('http://localhost:5000/api/learning/quizzes/submit', {
+      const response = await fetch(`${API_BASE_URL}/api/learning/quizzes/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

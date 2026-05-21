@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import Sidebar from '../components/Sidebar';
+import { API_BASE_URL } from '../config';
 import Header from '../components/Header';
 import ProgressRing from '../components/ProgressRing';
 import QuizEngine from '../components/QuizEngine';
@@ -67,7 +68,7 @@ export default function StudentDashboard() {
   const fetchDashboardData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/student/dashboard', {
+      const response = await fetch(`${API_BASE_URL}/api/student/dashboard`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -90,7 +91,7 @@ export default function StudentDashboard() {
   const handleStartLesson = async (lessonId: number) => {
     setIsQuestionsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/learning/lessons/${lessonId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/learning/lessons/${lessonId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
