@@ -41,7 +41,7 @@ interface StudentPerformance {
 }
 
 export default function FacultyDashboard() {
-  const { token } = useAuthStore();
+  const { token, logout } = useAuthStore();
   const [analytics, setAnalytics] = useState<FacultyAnalytics | null>(null);
   const [students, setStudents] = useState<StudentPerformance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -234,9 +234,14 @@ export default function FacultyDashboard() {
           <AlertCircle className="w-12 h-12 text-red-500" />
           <h3 className="font-extrabold text-white text-lg">Administrative Sync Error</h3>
           <p className="text-xs text-slate-400 leading-relaxed">{error || 'Server error occurred.'}</p>
-          <button onClick={fetchFacultyData} className="btn-premium px-6 py-2.5 text-xs font-bold">
-            Reconnect Server
-          </button>
+          <div className="flex items-center gap-3 mt-2">
+            <button onClick={fetchFacultyData} className="btn-premium px-6 py-2.5 text-xs font-bold">
+              Reconnect Server
+            </button>
+            <button onClick={() => logout()} className="px-6 py-2.5 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition duration-200">
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     );

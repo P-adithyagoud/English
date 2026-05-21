@@ -55,7 +55,7 @@ interface DashboardData {
 }
 
 export default function StudentDashboard() {
-  const { user, token } = useAuthStore();
+  const { user, token, logout } = useAuthStore();
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -130,9 +130,14 @@ export default function StudentDashboard() {
           <AlertCircle className="w-12 h-12 text-red-500" />
           <h3 className="font-extrabold text-white text-lg">Dashboard Error</h3>
           <p className="text-xs text-slate-400 leading-relaxed">{error || 'Unknown initialization error.'}</p>
-          <button onClick={fetchDashboardData} className="btn-premium px-6 py-2.5 text-xs font-bold">
-            Retry Connection
-          </button>
+          <div className="flex items-center gap-3 mt-2">
+            <button onClick={fetchDashboardData} className="btn-premium px-6 py-2.5 text-xs font-bold">
+              Retry Connection
+            </button>
+            <button onClick={() => logout()} className="px-6 py-2.5 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition duration-200">
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     );
