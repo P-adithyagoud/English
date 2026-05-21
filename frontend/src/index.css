@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-[#06070a] text-slate-100 font-sans antialiased overflow-x-hidden;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(95, 61, 196, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(28, 176, 246, 0.05) 0px, transparent 50%);
+    min-height: 100vh;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Premium Dark Glassmorphism Card */
+  .glass-card {
+    @apply bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl transition-all duration-300;
+  }
+  
+  .glass-card-hover {
+    @apply bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl transition-all duration-300 hover:bg-slate-800/60 hover:border-slate-700/80 hover:-translate-y-0.5 hover:shadow-brand/5;
+  }
+
+  /* Premium Light Glassmorphism Card (for student dashboard accents) */
+  .glass-card-brand {
+    @apply bg-brand-800/10 backdrop-blur-md border border-brand-500/20 rounded-2xl shadow-xl;
+  }
+  
+  /* Modern Input styles */
+  .glass-input {
+    @apply bg-slate-950/80 border border-slate-800/80 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500/80 focus:ring-1 focus:ring-brand-500/80 transition-all duration-200;
+  }
+
+  /* gamified button effects */
+  .btn-premium {
+    @apply relative overflow-hidden rounded-xl font-semibold text-white bg-brand shadow-lg hover:shadow-brand/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200;
+  }
+  
+  .btn-duo-success {
+    @apply rounded-xl font-bold uppercase tracking-wider text-white bg-duo-green border-b-[4px] border-duo-green-dark hover:brightness-105 active:border-b-0 active:translate-y-[4px] transition-all duration-100;
+  }
+
+  .btn-duo-danger {
+    @apply rounded-xl font-bold uppercase tracking-wider text-white bg-red-500 border-b-[4px] border-red-700 hover:brightness-105 active:border-b-0 active:translate-y-[4px] transition-all duration-100;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-950;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-brand-500/50 transition-all;
+}
+
+/* Animations for progress rings */
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
